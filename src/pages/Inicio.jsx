@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import { Paginator } from 'primereact/paginator';
-import DialogPro from '../components/DialogPro';
+import DialogPro from '../components/inicio/DialogPro';
 
 const API = 'https://dummyjson.com/products';
 

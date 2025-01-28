@@ -14,7 +14,7 @@ const Header = () => {
             url: '/inicio'
         },
         {
-            label: 'Categorias',
+            label: 'Paginas',
             icon: 'pi pi-search',
             items: [
                 {
@@ -30,16 +30,18 @@ const Header = () => {
                     icon: 'pi pi-pencil'
                 },
                 {
-                    label: 'Templates',
+                    label: 'Inventarios',
                     icon: 'pi pi-palette',
                     items: [
                         {
-                            label: 'Apollo',
-                            icon: 'pi pi-palette'
+                            label: 'Inventario',
+                            icon: 'pi pi-palette',
+                            url: '/inventario'
                         },
                         {
-                            label: 'Ultima',
-                            icon: 'pi pi-palette'
+                            label: 'Inventario II',
+                            icon: 'pi pi-palette',
+                            url: '/inventario2'
                         }
                     ]
                 }
