@@ -21,26 +21,23 @@ const Header = () => {
                     label: 'Components',
                     icon: 'pi pi-bolt'
                 },
-                {
-                    label: 'Blocks',
-                    icon: 'pi pi-server'
-                },
+               
                 {
                     label: 'UI Kit',
                     icon: 'pi pi-pencil'
                 },
                 {
                     label: 'Inventarios',
-                    icon: 'pi pi-palette',
+                    icon: 'pi pi-box',
                     items: [
                         {
                             label: 'Inventario',
-                            icon: 'pi pi-palette',
+                            icon: 'pi pi-image',
                             url: '/inventario'
                         },
                         {
                             label: 'Inventario II',
-                            icon: 'pi pi-palette',
+                            icon: 'pi pi-pencil',
                             url: '/inventario2'
                         }
                     ]

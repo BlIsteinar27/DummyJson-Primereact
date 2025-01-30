@@ -13,7 +13,7 @@ import { Skeleton } from 'primereact/skeleton';
 import DialogPro from '../components/inventario/DialogPro';
 
 
-const API = "http://localhost/pedidos/pedidosback/api/productos/getProductos.php"
+const API = "http://localhost/inventarios/back/api/productos/getProductos.php"
 
 const Inventario = () => {
     const [productos, setProductos] = useState([]);
@@ -85,7 +85,7 @@ const Inventario = () => {
             <>
                 <Button type="button" icon="pi pi-image" onClick={(e) => op.current.toggle(e)} />
                 <OverlayPanel ref={op}>
-                    <img src={rowData.miniatura} alt={rowData.nombre} style={{ width: '100px', height: '100px' }} />
+                    <img src={`../../../back/img/productos/${rowData.miniatura}`} alt={rowData.nombre} style={{ width: '100px', height: '100px' }} />
                 </OverlayPanel>
             </>
         );
