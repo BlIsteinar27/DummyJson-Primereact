@@ -16,11 +16,11 @@ const Inventario2 = () => {
     const [productos, setProductos] = useState([]);
     const [producto, setProducto] = useState({ nombre: '', categoria: '', precio: '', descuento: '', rating: '', stock: '', marca: '' });
     const [miniatura, setMiniatura] = useState(null);
-    
 
     const [cargando, setCargando] = useState(true);
     const [statuses] = useState(['INSTOCK', 'LOWSTOCK', 'OUTOFSTOCK']);
 
+    const [isEditing, setIsEditing] = useState(false);
     const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false);
     const [productoToDelete, setProductoToDelete] = useState(null);
     const toast = useRef(null);
@@ -48,48 +48,53 @@ const Inventario2 = () => {
 
     const openNew = () => {
         setProducto({ nombre: '', categoria: '', precio: '', descuento: '', rating: '', stock: '', marca: '' });
-
+        setIsEditing(false);
+        setVisible(true);
+    };
+    const editProducto = (producto) => {
+        setProducto(producto);
+        setIsEditing(true);
         setVisible(true);
     };
 
     // Función para manejar el clic en el botón
-const saveProducto = async (event) => {
-    event.preventDefault();
-    const method = 'POST';
-    const url = POST_API;
+    const saveProducto = async (event) => {
+        event.preventDefault();
+        const method = isEditing ? 'PUT' : 'POST';
+        const url = isEditing ? `http://localhost/inventarios/back/api/productos/updateProducto.php?id=${producto.id}` : POST_API;
 
-    try {
-        const formData = new FormData();
-        formData.append('nombre', producto.nombre);
-        formData.append('categoria', producto.categoria);
-        formData.append('precio', producto.precio);
-        formData.append('descuento', producto.descuento);
-        formData.append('rating', producto.rating);
-        formData.append('stock', producto.stock);
-        formData.append('marca', producto.marca);
-        if (miniatura && miniatura.length > 0) {
-            formData.append('miniatura', miniatura[0]); // Solo se envía una imagen
+        try {
+            const formData = new FormData();
+            formData.append('nombre', producto.nombre);
+            formData.append('categoria', producto.categoria);
+            formData.append('precio', producto.precio);
+            formData.append('descuento', producto.descuento);
+            formData.append('rating', producto.rating);
+            formData.append('stock', producto.stock);
+            formData.append('marca', producto.marca);
+            if (miniatura && miniatura.length > 0) {
+                formData.append('miniatura', miniatura[0]); // Solo se envía una imagen
+            }
+
+            const response = await fetch(url, {
+                method: method,
+                body: formData, // No se necesita especificar el Content-Type
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                toast.current.show({ severity: 'success', summary: 'Éxito', detail: `Producto ${isEditing ? 'actualizado' : 'inscrito'} correctamente.`, life: 3000 });
+                setVisible(false);
+                fetchProductos();
+            } else {
+                toast.current.show({ severity: 'error', summary: 'Error', detail: result.message || 'Error desconocido', life: 3000 });
+            }
+        } catch (error) {
+            console.error('Error al enviar los datos:', error);
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Error al enviar los datos.', life: 3000 });
         }
-
-        const response = await fetch(url, {
-            method: method,
-            body: formData, // No se necesita especificar el Content-Type
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            toast.current.show({ severity: 'success', summary: 'Éxito', detail: `Producto agregado correctamente.`, life: 3000 });
-            setVisible(false);
-            fetchProductos();
-        } else {
-            toast.current.show({ severity: 'error', summary: 'Error', detail: result.message || 'Error desconocido', life: 3000 });
-        }
-    } catch (error) {
-        console.error('Error al enviar los datos:', error);
-        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Error al enviar los datos.', life: 3000 });
-    }
-};
+    };
 
 
     const confirmDelete = (id) => {
@@ -99,7 +104,7 @@ const saveProducto = async (event) => {
 
     const deleteProducto = async () => {
         try {
-            const response = await fetch(`http://localhost/productos/api/productos/deleteProducto.php?id=${productoToDelete}`, {
+            const response = await fetch(`http://localhost/inventarios/back/api/productos/deleteProducto.php?id=${productoToDelete}`, {
                 method: 'DELETE',
             });
 
@@ -201,8 +206,8 @@ const saveProducto = async (event) => {
                         ) : (
                             <div>
                                 <Button icon="pi pi-plus" label="Agregar Producto" className='p-button-success' onClick={openNew} />
-                                <DataTable value={productos} editMode="row" dataKey="id" onRowEditComplete={onRowEditComplete} paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]} tableStyle={{ minWidth: '50rem' }}>
-                                    <Column field="id" header="Id" editor={(options) => textEditor(options)} style={{ width: '20%' }}></Column>
+                                <DataTable value={productos}  editMode="row" dataKey="id" onRowEditComplete={onRowEditComplete} paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]} tableStyle={{ minWidth: '50rem' }}>
+                                    <Column field="id" sortable header="Id" editor={(options) => textEditor(options)} style={{ width: '20%' }}></Column>
                                     <Column field="nombre" header="Nombre" editor={(options) => textEditor(options)} style={{ width: '20%' }}></Column>
                                     <Column field="categoria" header="Categoria" editor={(options) => textEditor(options)} style={{ width: '20%' }}></Column>
                                     <Column field="inventoryStatus" header="Estado" editor={(options) => statusEditor(options)} style={{ width: '20%' }}></Column>
@@ -212,7 +217,7 @@ const saveProducto = async (event) => {
                                             <Button
                                                 icon="pi pi-pencil"
                                                 className="p-button-info p-mr-2"
-                                                onClick={() => console.log('Editar producto:', rowData.id)}
+                                                onClick={() => editProducto(rowData)}
                                             />
                                             <Button
                                                 icon="pi pi-trash"
@@ -294,15 +299,15 @@ const saveProducto = async (event) => {
                         </div>
                         <div className="mb-3">
                             <label htmlFor="miniatura" className="form-label">Miniatura</label>
-                            <input 
-                            type="file" 
-                            className="form-control" 
-                            id="miniatura"
-                            accept="image/*"
-                            onChange={(e) => setMiniatura(Array.from(e.target.files))} 
-                            required
+                            <input
+                                type="file"
+                                className="form-control"
+                                id="miniatura"
+                                accept="image/*"
+                                onChange={(e) => setMiniatura(Array.from(e.target.files))}
+                                required
                             />
-                         
+
                         </div>
                     </form>
                 </Dialog>
