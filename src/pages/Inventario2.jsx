@@ -54,18 +54,28 @@ const Inventario2 = () => {
         event.preventDefault();
         const method = isEditing ? 'PUT' : 'POST';
         const url = isEditing
-            ? `http://localhost/inventarios/back/api/productos/updateProducto2.php?id=${producto.id}`
+            ? `http://localhost/inventarios/back/api/productos/updateProducto4.php?id=${producto.id}` // <--- Enviar el ID en la URL
             : POST_API;
-
+    
         try {
+            const formData = new FormData();
+            formData.append('nombre', producto.nombre);
+            formData.append('categoria', producto.categoria);
+            formData.append('precio', producto.precio);
+            formData.append('descuento', producto.descuento);
+            formData.append('rating', producto.rating);
+            formData.append('stock', producto.stock);
+            formData.append('marca', producto.marca);
+    
+            if (miniatura && miniatura.length > 0) {
+                formData.append('miniatura', miniatura[0]);
+            }
+    
             const response = await fetch(url, {
                 method: method,
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(producto), // Enviar los datos como JSON
+                body: formData,
             });
-
+    
             const result = await response.json();
             if (response.ok) {
                 toast.current.show({ severity: 'success', summary: 'Éxito', detail: `Producto ${isEditing ? 'actualizado' : 'inscrito'} correctamente.`, life: 3000 });
